@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+
+.idea
+
+*db.cfg
+emon.cfg
+schema.json
