@@ -1,4 +1,5 @@
 from typing import Dict
+import os
 import json
 
 from CleanEmonCore import CONFIG_FILE
@@ -6,10 +7,14 @@ from CleanEmonCore.models import EnergyData
 from CleanEmonCore.CouchDBAdapter import CouchDBAdapter
 
 from CleanEmonBackend.lib.DBConnector import fetch_data, send_data
-from CleanEmonBackend.Disaggregator.service import update
+
+from . import __path__
 
 adapter = CouchDBAdapter(CONFIG_FILE)
-print(f"You are working on database: {adapter.db}")
+
+
+def get_static_file(filename):
+    return os.path.join(__path__[0], "static", filename)
 
 
 def _prompt_meta() -> Dict:
@@ -87,14 +92,10 @@ def _reset_file(date: str):
     print("Done")
 
 
-def _disaggregate(date: str):
-    print(f"Working on {date}")
-    print("Disaggregating...")
-    update(date)
-    print("Done")
+def reset_file(*dates: str, no_prompt=False):
+    if not no_prompt:
+        print(f"You are working on database: {adapter.db}")
 
-
-def _batch_dates_executor(fn, *dates: str, no_prompt=False):
     for date in dates:
         if no_prompt:
             ans = True
@@ -102,14 +103,31 @@ def _batch_dates_executor(fn, *dates: str, no_prompt=False):
             ans = input(f"Proceed with {date}? (<enter>: no) ")
 
         if ans:
-            fn(date)
+            _reset_file(date)
         else:
             break
 
 
-def reset_file(*dates: str, no_prompt=False):
-    _batch_dates_executor(_reset_file, *dates, no_prompt=no_prompt)
+def create_database(name: str, no_prompt=False):
+    if not no_prompt:
+        ans = True
+    else:
+        print(f"You are working on database: {adapter.db}")
+        ans = input(f"Create database named \"{name}\"? (<enter>: no) ")
 
+    if ans:
+        if adapter.create_database(name):
+            adapter.db = name
+            print("Database has been successfully created!")
+            print("Please update manually the config file to reflect the changes")
 
-def disaggregate(*dates: str, no_prompt=False):
-    _batch_dates_executor(_disaggregate, *dates, no_prompt=no_prompt)
+            views_file = get_static_file("design.api.json")
+            with open(views_file, "r") as f_in:
+                views = json.load(f_in)
+            adapter.create_raw_document("_design/api", initial_data=views)
+            print("Views have been successfully initialized!")
+        else:
+            print("Couldn't create the specified database")
+    else:
+        print("Aborting...")
+        return
