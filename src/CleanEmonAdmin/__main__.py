@@ -1,10 +1,5 @@
 import argparse
 
-from .scripts import add_meta
-from .scripts import reset_file
-from .scripts import create_database
-from .generate_config import generate_config
-
 parser = argparse.ArgumentParser(prog="CleanEmonAdmin",
                                  description="A set of useful admin-tools for the CleanEmon ecosystem")
 subparsers = parser.add_subparsers(help="commands", dest="command")
@@ -31,16 +26,21 @@ args = parser.parse_args()
 print(args)
 
 if args.command == "create-db":
+    from .scripts import create_database
     create_database(args.name, no_prompt=args.no_safe)
 
 elif args.command == "export-config":
+    from .generate_config import generate_config
     generate_config(section=args.section)
 
 elif args.command == "add-meta":
+    from .scripts import add_meta
     add_meta()
 
 elif args.command == "reset-date":
+    from .scripts import reset_file
     if args.dates:
+
         reset_file(args.dates, no_prompt=args.no_safe)
     else:
         print("You should provide at least one date")
