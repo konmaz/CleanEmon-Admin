@@ -1,5 +1,7 @@
 import getpass
 
+from CleanEmonCore.dotfiles import _CONFIG_FILENAME
+from CleanEmonCore.dotfiles import get_dotfile
 from CleanEmonCore.dotfiles import write_config
 from CleanEmonCore.dotfiles import read_config
 
@@ -51,8 +53,6 @@ def _generate_db():
 
     write_config(config)
 
-    print(f"Config file was successfully generated!")
-
 
 def _generate_emon():
     config = read_config()
@@ -80,8 +80,6 @@ def _generate_emon():
 
     write_config(config)
 
-    print(f"Config file was successfully generated!")
-
 
 def generate_config(section):
     if section == "emon":
@@ -91,3 +89,5 @@ def generate_config(section):
     else:
         _generate_db()
         _generate_emon()
+
+    print(f"Config file was successfully generated at {get_dotfile(_CONFIG_FILENAME)}")
