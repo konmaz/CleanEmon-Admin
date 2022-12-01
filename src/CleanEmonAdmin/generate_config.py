@@ -32,22 +32,12 @@ def _generate_db():
         print("and replace it in the generated config file.")
         input("Press enter to continue...")
 
-    # Document Name
-    document_name = input("CouchDB Document Name: ")
-    if not document_name:
-        document_name = "REPLACE_ME"
-        print("Document Name cannot be omitted. This will cause trouble!")
-        print("Please specify the predefined document")
-        print("and replace it in the generated config file.")
-        input("Press enter to continue...")
-
     # Username and Password
     username = input("CouchDB Username: ")
     password = getpass.getpass("CouchDB Password: ")
 
     config["DB"]["endpoint"] = f"http://{db_ip}:{db_port}"
     config["DB"]["db_name"] = db_name
-    config["DB"]["document_name"] = document_name
     config["DB"]["username"] = username
     config["DB"]["password"] = password
 
