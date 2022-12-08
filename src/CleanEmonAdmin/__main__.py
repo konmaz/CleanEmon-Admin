@@ -14,12 +14,13 @@ export_config.add_argument("section", nargs="?", choices=["db", "emon"],
                            help="default=all, db=CouchDB related, emon=EmonPi related")
 
 # Add Meta Data
-subparsers.add_parser("add-meta", help="Add custom meta-data to current database")
+add_meta_parser = subparsers.add_parser("add-meta", help="Add custom meta-data to current database")
+add_meta_parser.add_argument("name", help="the name of the database to add the meta")
 
 # Reset File
 reset_date_parser = subparsers.add_parser("reset-date", help="Discard clean data and revert to primitive data")
-reset_date_parser.add_argument("dates", nargs="*",
-                               help="list of dates (YYYY-MM-DD) to be reset")
+reset_date_parser.add_argument("name", help="the name of the database records to be reset")
+reset_date_parser.add_argument("dates", nargs="*", help="list of dates (YYYY-MM-DD) to be reset")
 parser.add_argument("--no-safe", action="store_false", help="prompt before proceeding with critical actions")
 
 args = parser.parse_args()
@@ -35,7 +36,7 @@ elif args.command == "export-config":
 
 elif args.command == "add-meta":
     from .scripts import add_meta
-    add_meta()
+    add_meta(args.name, no_prompt=args.no_safe)
 
 elif args.command == "reset-date":
     from .scripts import reset_file

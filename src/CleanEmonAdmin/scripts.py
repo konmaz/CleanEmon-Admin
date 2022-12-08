@@ -30,10 +30,10 @@ def _prompt_meta() -> Dict:
     return data
 
 
-def add_meta():
+def add_meta(name: str, no_prompt=False):
     while True:
+        print(f"Adding Meta-data for {name}")
         print("Meta-data Prompt...")
-
         data = _prompt_meta()
         print(json.dumps(data, indent=4))
 
@@ -41,7 +41,7 @@ def add_meta():
         if not ans or ans in "nN":
             "Aborting meta-data..."
         elif ans in "yY":
-            name = adapter.create_raw_document("meta", initial_data=data)
+            name = adapter.create_raw_document("meta", initial_data=data, db=name)
             if name:
                 print("Meta-data where uploaded successfully!")
             else:
@@ -119,7 +119,7 @@ def create_database(name: str, no_prompt=False):
         if adapter.create_database(name):
             adapter.db = name
             print("Database has been successfully created!")
-            print("Please update manually the config file to reflect the changes")
+            # print("Please update manually the config file to reflect the changes") # This should be anymore necessary.
 
             views_file = get_static_file("design.api.json")
             with open(views_file, "r") as f_in:
